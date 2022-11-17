@@ -13,14 +13,16 @@ start:
 
 msg:
     .text "              hello, world!             "
+    .byte $00                       // End of string
 
 draw_text:
-    ldx #$00
+    ldx #00                         // character: position within the line
 
 draw_loop:
     lda msg,x
-    sta $05e0,x
+    beq draw_loop_end               // if character is zero, we're done
+    sta $0400,x                     // $0400 is the start of the screen memory
     inx
-    cpx #$28                        // 40 characters per line
     bne draw_loop
+draw_loop_end:
     rts

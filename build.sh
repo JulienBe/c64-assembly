@@ -7,6 +7,9 @@
 
 filename=$(basename "$1" .asm)
 
+rm -f "$filename".prg
+rm -f "$filename".sym
+
 echo "###################### Compiling $1 ######################"
 java -jar toolchain/KickAss.jar "$filename".asm
 

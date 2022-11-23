@@ -1,40 +1,36 @@
 BasicUpstart2(start)                // There is a second variation of the basic upstart macro that also takes care of setting up memory blocks:
 
+.label screen_pointer_lo = $fa
+.label screen_pointer_hi = $fb
+.label char_lo = $fc
+.label char_hi = $fd
+
 * = $4000
+
 start:
-    lda #$00
-    sta $d020                       // Border color             : 0
-    sta $d021                       // Background color         : 0
+    lda #$00;    sta $d020;    sta $d021    // Border & Background  color         : 0
+    lda #$01;    sta $0286                  // Cursor address           : 1
+    jsr $e544                               // Clear screen function
 
-    lda #$01
-    sta $0286                       // Cursor address           : 1
-    jsr $e544                       // Clear screen function
-
-    lda #$00                        // lsb of $0400
-    sta $fa                         //  00 to 0-page fa
-    lda #$04                        // msb of $0400
-    sta $fb                         //  04 to 0-page fb
-
-    lda #$00
-    ldy #$00
-
-    jsr write_loop
+    jsr write_start
     jmp *
 
 msg:
-    .text "              hello, world!             "
+    .text "123456789     hello, world!             "
     .byte $00                       // End of string
 
+
+write_start:
+    lda #$00;    sta screen_pointer_lo           //  00 to 0-page fa
+    lda #$04;    sta screen_pointer_hi           //  04 to 0-page fb
+    ldy #$00
 write_loop:
-    sta ($fa),y                     // Start of loop 1 to increment / points to LSB
-    iny                             // increment LSB
-    bne write_loop                  // if y != 0 goto clrloop
-    ldx $fb                         // load x (MSB) with value from zero page location $fb
-                                    // loop 2 for MSB
-    inx                             // increment x (MSB)
-    stx $fb                         // store x (MSB) in zero page location $fb
-    cpx #$08                        // if x != 8
-    bne write_loop                  // goto clrloop
+    lda msg,y;   sta (screen_pointer_lo),y       // load msg + y in a; put char to screen pointer low       // Start of loop 1 to increment / points to LSB
+    iny;         bne write_loop                  // increment LSB; if y != 0 goto clrloop
+    ldx screen_pointer_hi                        // load x (MSB) with value from zero page location $fb
+                                                 // loop 2 for MSB
+    inx;         stx screen_pointer_hi           // store x (MSB) in zero page location $fb
+    cpx #$08;    bne write_loop                  // if x != 8; goto clrloop
     rts
 
 /**

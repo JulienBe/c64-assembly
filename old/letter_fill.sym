@@ -1,0 +1,3 @@
+.label start=$2000
+.label screen_loop=$200c
+.label char_loop=$2000

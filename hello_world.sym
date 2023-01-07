@@ -1,0 +1,10 @@
+.label msg=$4016
+.label draw_loop=$405d
+.label draw_loop_end=$4068
+.label write_loop=$4049
+.label screen_pointer_lo=$fa
+.label draw_text=$405b
+.label char=$fc
+.label start=$4000
+.label screen_pointer_hi=$fb
+.label write_start=$403f
